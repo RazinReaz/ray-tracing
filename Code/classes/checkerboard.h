@@ -4,9 +4,8 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include "vector3f.h"
 #include "color.h"
-#include "interfaces.h"
+#include "shape3d.h"
 
 
 

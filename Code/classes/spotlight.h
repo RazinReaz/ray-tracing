@@ -4,8 +4,8 @@
 
 #include <vector>
 #include <gl/glut.h>
-#include "vector3f.h"
-#include "interfaces.h"
+#include "light.h"
+
 
 class spotlight : public light
 {
@@ -52,10 +52,7 @@ public:
         int angle1 = (int)(atan(direction.y / sqrt(direction.x * direction.x + direction.z * direction.z)) * 180 / PI);
         glColor3f(1, 1, 0.5);
         glPushMatrix();
-            // glTranslatef(position.x, position.y, position.z);
             glPushMatrix();
-                // glRotatef(angle0, 0, 1, 0);
-                // glRotatef(45, 0, 0, 1);
                 glutSolidCone(radius, height, slices, 10);  
             glPopMatrix();
         glPopMatrix();

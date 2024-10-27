@@ -6,9 +6,8 @@
 #include <iostream>
 #include <vector>
 
-#include "vector3f.h"
-#include "interfaces.h"
-#include "color.h"
+#include "shape3d.h"
+#include "triangle.h"
 
 
 class pyramid : public shape3d {

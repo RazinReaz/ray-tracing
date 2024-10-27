@@ -4,7 +4,6 @@
 #include <vector>
 #include "vector3f.h"
 #include "color.h"
-#include "material.h"
 
 
 #define EPSILON 0.00001

@@ -41,7 +41,7 @@ I ran the capturing code 4 times and took the average time.
 - [x] fix `fast disregard` in ray sphere intersection.
 - [ ] back face culling 
 - [ ] using const
-- [ ] ray inside sphere
+- [x] ray inside sphere
 - [ ] finish refactoring
     - testing needed
     - `include`/`headers` folder
@@ -55,11 +55,11 @@ I ran the capturing code 4 times and took the average time.
         - Is the sky the only light? (According to ray tracing in one weekend)
         - I can watch the video from Josh's channel
         - I can watch the cherno playlist
-- [ ] materials array
-    - [ ] attenuation
+- [x] materials
+    - [x] attenuation
     - [x] material index in the object
 - [x] gamma correction
-- [ ] multiple light sources
+- [ ] emmisive material
 - [ ] bidirectional path tracing
 - [ ] real time
     - will not go inside the ray

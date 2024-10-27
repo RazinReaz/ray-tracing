@@ -10,22 +10,22 @@
 
 #include "classes/bitmap_image.hpp"
 #include "classes/inicpp.h"
-#include "classes/random.h"
-#include "classes/rtutils.h"
-#include "classes/config.h"
-#include "classes/material.h"
 
-#include "classes/camera.h"
 #include "classes/vector3f.h"
 #include "classes/color.h"
 
+#include "classes/random.h"
+#include "classes/rtutils.h"
+#include "classes/config.h"
+#include "classes/camera.h"
+
+#include "classes/ray.h"
+#include "classes/material.h"
+#include "classes/shape3d.h"
+
+
 #include "classes/point_light.h"
 #include "classes/spotlight.h"
-#include "classes/sphere.h"
-#include "classes/cube.h"
-#include "classes/pyramid.h"
-#include "classes/checkerboard.h"
-
 
 Camera camera;
 bitmap_image image;
@@ -70,8 +70,8 @@ namespace utils
 
     color trace_ray(ray r, std::vector<shape3d *> objects, std::vector<light *> lights, int recursions)
     {
-        color c = {0, 0, 0};
-        double multiplier = 1.0;
+        color integrated = {0, 0, 0};
+        color attenuation = {1, 1, 1};
         ray current_ray = r;
         while (recursions--) {
             current_ray.reset_hit();
@@ -80,7 +80,7 @@ namespace utils
 
             if (!current_ray.hit_info.hit)
             {
-                c += sky_color * multiplier;
+                integrated += sky_color * attenuation;
                 break;
             }
             
@@ -88,12 +88,11 @@ namespace utils
             vector3f normal = current_ray.hit_info.normal;
             std::shared_ptr<material> mat = current_ray.hit_info.mat;
 
-            multiplier *= 0.5;
-            c += mat->albedo * multiplier;
+            attenuation *= mat->albedo;
 
             current_ray = mat->scatter(current_ray, point, normal);
         }
-        return c;
+        return integrated;
     }
     
     color per_pixel(int& i, int& j, Camera camera, vector3f upper_left, int& antialiasing_samples, std::vector<shape3d *> objects, std::vector<light *> lights, int& recursions) {

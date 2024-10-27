@@ -19,6 +19,7 @@ typedef struct color {
     color operator+=(const color &c);
     color operator*(const double &d) const;
     color operator*(const color &c) const;
+    color operator*=(const color &c);
 } color;
 
 // enum to define colors
@@ -65,4 +66,11 @@ color color::operator*(const color &c) const {
             g = this->g * c.g,
             b = this->b * c.b;
     return color(r, g, b);
+}
+
+color color::operator*=(const color &c) {
+    this->r = clamp(this->r * c.r);
+    this->g = clamp(this->g * c.g);
+    this->b = clamp(this->b * c.b);
+    return *this;
 }

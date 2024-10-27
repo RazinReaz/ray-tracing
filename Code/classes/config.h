@@ -1,20 +1,16 @@
 #include "inicpp.h"
 #include "vector3f.h"
-#include "interfaces.h"
-#include "sphere.h"
 #include "checkerboard.h"
 #include "point_light.h"
 #include "spotlight.h"
 #include "material.h"
+#include "sphere.h"
 
 #include <iostream>
 #include <vector>
 #include <cmath>
 #include <memory>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
 
 std::vector<double> double_vector_from_string(const std::string &str, const char delimiter)
 {

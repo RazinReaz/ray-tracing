@@ -3,8 +3,7 @@
 #include <vector>
 #include <cassert>
 #include <gl/glut.h>
-#include "vector3f.h"
-#include "interfaces.h"
+#include "light.h"
 
 
 

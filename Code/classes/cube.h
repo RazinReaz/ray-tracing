@@ -6,9 +6,8 @@
 #include <iostream>
 #include <memory>
 
-#include "vector3f.h"
-#include "color.h"
-#include "interfaces.h"
+#include "face.h"
+#include "shape3d.h"
 
 class cube : public shape3d {
     public:
