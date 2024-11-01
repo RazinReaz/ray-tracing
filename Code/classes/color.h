@@ -16,10 +16,16 @@ typedef struct color {
     }
     double clamp(double x) const;
     color operator+(const color &c) const;
-    color operator+=(const color &c);
-    color operator*(const double &d) const;
+    color operator*(double d) const;
     color operator*(const color &c) const;
+    color operator+=(const color &c);
     color operator*=(const color &c);
+
+    friend std::ostream &operator<<(std::ostream &os, const color &c)
+    {
+        os << "color(" << c.r << ", " << c.g << ", " << c.b << ")";
+        return os;
+    }
 } color;
 
 // enum to define colors
@@ -55,7 +61,7 @@ color color::operator+=(const color &c) {
     return *this;
 }
 
-color color::operator*(const double &d) const {
+color color::operator*(double d) const {
     double r = clamp(this->r * d), g = clamp(this->g * d), b = clamp(this->b * d);
     return color(r, g, b);
 }

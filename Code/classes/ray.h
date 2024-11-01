@@ -35,21 +35,21 @@ public:
         this->hit_info.mat = NULL;
     }
 
-    ray reflect(const vector3f &reflection_point, vector3f &normal);
-    void set_hit(double hit_distance, vector3f normal, std::shared_ptr<material> mat, const double offset = 0.01);
+    ray reflect(const vector3f &reflection_point, const vector3f &normal) const;
+    void set_hit(double hit_distance, const vector3f& normal, std::shared_ptr<material> mat, const double offset = 0.01);
     void reset_hit();
     void show();
     // assignment operator
     ray &operator=(const ray &r);
 };
 
-ray ray::reflect(const vector3f &reflection_point, vector3f &normal)
+ray ray::reflect(const vector3f &reflection_point, const vector3f &normal) const
 {
     vector3f reflected_direction = this->direction - normal * 2.0 * this->direction.dot(normal);
     return ray(reflection_point, reflected_direction);
 };
 
-void ray::set_hit(double hit_distance, vector3f normal, std::shared_ptr<material> mat, const double offset)
+void ray::set_hit(double hit_distance, const vector3f& normal, std::shared_ptr<material> mat, const double offset)
 {
     if (hit_distance < 0)
         return;

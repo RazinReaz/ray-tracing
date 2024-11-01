@@ -11,16 +11,7 @@ bool fast_disregard = false;
 
 class sphere : public shape3d
 {
-private:
-    inline bool is_ray_inside(ray &r)
-    {
-        return (this->center - r.origin).length() < this->radius;
-    }
-    inline bool is_ray_outside(ray &r)
-    {
-        return (this->center - r.origin).length() > this->radius;
-    }
-
+    
 public:
     vector3f center;
     double radius;
@@ -30,7 +21,7 @@ public:
         this->radius = radius;
     }
 
-    void calculate_hit_distance(ray &r)
+    void calculate_hit_distance(ray &r) const override
     {
         double t;
         vector3f hypotenuse = r.origin - this->center;  // vector from sphere center to ray origin
@@ -65,12 +56,12 @@ public:
         return;
     }
 
-    vector3f normal_at(vector3f &point)
+    vector3f normal_at(const vector3f &point) const override
     {
         return (point - this->center)/this->radius; //! RAZIN: changed
     }
 
-    color get_color_at(vector3f &point) override
+    color get_color_at(const vector3f &point) const override
     {
         return this->clr;
     }

@@ -17,7 +17,7 @@ typedef struct triangle_
         this->normal = (b - a).cross(c - a).normalize();
     }
 
-    bool contains_point(vector3f &point)
+    bool contains_point(const vector3f &point) const
     {
         vector3f ab = b - a;
         vector3f ac = c - a;

@@ -8,6 +8,7 @@
 
 #include "shape3d.h"
 #include "triangle.h"
+#include "face.h"
 
 
 class pyramid : public shape3d {
@@ -37,7 +38,7 @@ class pyramid : public shape3d {
         this->face = face_(vector3f(0, -1, 0), base_center, width);
     }
 
-    vector3f normal_at(vector3f &point) override {
+    vector3f normal_at(const vector3f &point) const override {
         for (auto triangle : triangles) {
             if (triangle->contains_point(point)) {
                 return triangle->normal;
@@ -47,11 +48,12 @@ class pyramid : public shape3d {
 
     }
 
-    color get_color_at(vector3f &point) override {
+    color get_color_at(const vector3f &point) const override {
         return clr;
     }
 
-    void calculate_hit_distance(ray &r) {
+    void calculate_hit_distance(ray &r) const override 
+    {
         double distance = -1;
         for (auto triangle : triangles) {
             if (triangle->is_hit_by_ray(r, distance)) {

@@ -1,15 +1,15 @@
-#include "inicpp.h"
-#include "vector3f.h"
-#include "checkerboard.h"
-#include "point_light.h"
-#include "spotlight.h"
-#include "material.h"
-#include "sphere.h"
+#pragma once
 
 #include <iostream>
 #include <vector>
 #include <cmath>
 #include <memory>
+
+#include "inicpp.h"
+#include "vector3f.h"
+#include "material.h"
+#include "sphere.h"
+#include "checkerboard.h"
 
 
 std::vector<double> double_vector_from_string(const std::string &str, const char delimiter)
@@ -25,7 +25,7 @@ std::vector<double> double_vector_from_string(const std::string &str, const char
     return result;
 }
 
-std::shared_ptr<material> create_material(ini::IniFile ini, std::string material_name)
+std::shared_ptr<material> create_material(ini::IniFile& ini, const std::string& material_name)
 {
     std::string material_type = ini[material_name]["type"].as<std::string>();
     if (material_type == "metal")
@@ -41,6 +41,13 @@ std::shared_ptr<material> create_material(ini::IniFile ini, std::string material
         color c = {albedo[0], albedo[1], albedo[2]};
         return std::make_shared<lambertian>(c);
     }
+    else if (material_type == "emissive")
+    {
+        std::vector<double> emission_color = double_vector_from_string(ini[material_name]["emission_color"].as<std::string>(), ',');
+        double i = ini[material_name]["emission_intensity"].as<double>();
+        color e = {emission_color[0], emission_color[1], emission_color[2]};
+        return std::make_shared<emissive>(e, i);
+    }
     else
     {
         std::cout << "Invalid material type" << std::endl;
@@ -48,7 +55,7 @@ std::shared_ptr<material> create_material(ini::IniFile ini, std::string material
     }
 }
 
-void set_general_config(ini::IniFile ini, int &recursions, int &antialiasing_samples, double &pixels_sample_scale)
+void set_general_config(ini::IniFile& ini, int &recursions, int &antialiasing_samples, double &pixels_sample_scale)
 {
     recursions = ini["general"]["recursions"].as<int>();
     antialiasing_samples = ini["general"]["antialiasing_samples"].as<int>();
@@ -56,7 +63,7 @@ void set_general_config(ini::IniFile ini, int &recursions, int &antialiasing_sam
     return;
 }
 
-void set_viewport_config(ini::IniFile ini, int &near_, int &far_, int &fovY, int &aspect_ratio, double &vp_width, double &vp_height, int &img_width, int &img_height, double &dw, double &dh)
+void set_viewport_config(ini::IniFile& ini, int &near_, int &far_, int &fovY, int &aspect_ratio, double &vp_width, double &vp_height, int &img_width, int &img_height, double &dw, double &dh)
 {
     near_ = ini["viewport"]["near"].as<int>();
     far_ = ini["viewport"]["far"].as<int>();
@@ -71,7 +78,7 @@ void set_viewport_config(ini::IniFile ini, int &near_, int &far_, int &fovY, int
     return;
 }
 
-void set_camera_config(ini::IniFile ini, vector3f &position, vector3f &target)
+void set_camera_config(ini::IniFile& ini, vector3f &position, vector3f &target)
 {
     std::vector<double> camera_position = double_vector_from_string(ini["camera"]["position"].as<std::string>(), ',');
     std::vector<double> camera_target = double_vector_from_string(ini["camera"]["target"].as<std::string>(), ',');
@@ -80,7 +87,7 @@ void set_camera_config(ini::IniFile ini, vector3f &position, vector3f &target)
     return;
 }
 
-shape3d *create_plane(ini::IniFile ini)
+shape3d *create_plane(ini::IniFile& ini)
 {
     std::string type = ini["plane"]["type"].as<std::string>();
     if (type == "checkerboard") {
@@ -99,7 +106,7 @@ shape3d *create_plane(ini::IniFile ini)
     }
 }
 
-shape3d *create_object(ini::IniFile ini, std::string object_name)
+shape3d *create_object(ini::IniFile& ini, const std::string& object_name)
 {
     std::string object_type = ini[object_name]["type"].as<std::string>();
     if (object_type == "sphere")
@@ -117,27 +124,8 @@ shape3d *create_object(ini::IniFile ini, std::string object_name)
     }
 }
 
-light *create_light(ini::IniFile ini, std::string light_name)
-{
-    std::string light_type = ini[light_name]["type"].as<std::string>();
-    if (light_type == "point")
-    {
-        std::vector<double> position = double_vector_from_string(ini[light_name]["position"].as<std::string>(), ',');
-        double falloff = ini[light_name]["falloff"].as<double>();
-        return new point_light({position[0], position[1], position[2]}, falloff);
-    }
-    else if (light_type == "spot" || light_type == "spotlight")
-    {
-        std::vector<double> position = double_vector_from_string(ini[light_name]["position"].as<std::string>(), ',');
-        std::vector<double> direction = double_vector_from_string(ini[light_name]["direction"].as<std::string>(), ',');
-        double falloff = ini[light_name]["falloff"].as<double>();
-        double cutoff_angle = ini[light_name]["cutoff_angle"].as<double>();
-        return new spotlight({position[0], position[1], position[2]}, falloff, cutoff_angle, {direction[0], direction[1], direction[2]});
-    }
-    else
-    {
-        std::cout << "Invalid light type" << std::endl;
-        return nullptr;
-    }
-}
 
+color get_sky(ini::IniFile& ini) {
+    std::vector<double> sky_color = double_vector_from_string(ini["scene"]["sky_color"].as<std::string>(), ',');
+    return {sky_color[0], sky_color[1], sky_color[2]};
+}

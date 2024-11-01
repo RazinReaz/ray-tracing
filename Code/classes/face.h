@@ -34,12 +34,12 @@ typedef struct face_
         return *this;
     }
 
-    inline bool within(const double &q, const double &min, const double &max)
+    inline bool within(const double &q, const double &min, const double &max) const
     {
         return (q >= min && q <= max);
     }
 
-    bool is_hit_by_ray(ray &r, double &distance)
+    bool is_hit_by_ray(ray &r, double &distance) const 
     {
         distance = (mid_point - r.origin).dot(normal) / r.direction.dot(normal);
         if (distance < 0)
@@ -48,7 +48,7 @@ typedef struct face_
         return contains_point(point);
     }
 
-    bool contains_point(const vector3f &point)
+    bool contains_point(const vector3f &point) const
     {
         if (normal.x != 0)
         {

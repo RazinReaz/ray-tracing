@@ -24,9 +24,6 @@
 #include "classes/shape3d.h"
 
 
-#include "classes/point_light.h"
-#include "classes/spotlight.h"
-
 Camera camera;
 bitmap_image image;
 
@@ -38,11 +35,15 @@ double viewport_height, viewport_width, dw, dh;
 bool gamma_correction_enabled = false;
 
 std::vector<shape3d *> objects;
-std::vector<light *> lights;
+std::vector<unsigned char> color_buffer;
+color sky_color;
 
 vector3f x_axis = {1, 0, 0};
 vector3f y_axis = {0, 1, 0};
 vector3f z_axis = {0, 0, 1};
+
+long long total_elapsed_time = 0;
+long long timer_count = 0;
 
 namespace utils
 {
@@ -60,6 +61,26 @@ namespace utils
         return;
     }
 
+    void set_pixel_to_buffer(std::vector<unsigned char> &color_buffer, int image_width, int image_height, int j, int i, int red, int green, int blue)
+    {
+        int index = 3 * (i * image_width + j);
+        color_buffer[index] = red;
+        color_buffer[index + 1] = green;
+        color_buffer[index + 2] = blue;
+    }
+
+    void print_color_buffer_to_image(bitmap_image &image, std::vector<unsigned char> &color_buffer, int image_width, int image_height)
+    {
+        int index = 0;
+        for (int i = 0; i < image_height; i++) {
+            for (int j = 0; j < image_width; j++) {
+                image.set_pixel(j, i, color_buffer[index], color_buffer[index + 1], color_buffer[index + 2]);
+                index += 3;
+            } 
+        }
+        return;
+    }
+
 
     ray shoot_ray_at(int i, int j, Camera& camera, vector3f upper_left)
     {
@@ -68,13 +89,15 @@ namespace utils
         return ray(pixel_position, ray_direction);
     }
 
-    color trace_ray(ray r, std::vector<shape3d *> objects, std::vector<light *> lights, int recursions)
+    color trace_ray(ray r, std::vector<shape3d *> objects, int recursions)
     {
         color integrated = {0, 0, 0};
         color attenuation = {1, 1, 1};
         ray current_ray = r;
         while (recursions--) {
+        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
             current_ray.reset_hit();
+            
             for (auto object : objects) 
                 object->calculate_hit_distance(current_ray);
 
@@ -87,22 +110,55 @@ namespace utils
             vector3f point = current_ray.hit_info.point;
             vector3f normal = current_ray.hit_info.normal;
             std::shared_ptr<material> mat = current_ray.hit_info.mat;
-
-            attenuation *= mat->albedo;
-
+            
+            attenuation *= mat->get_color();
+            integrated += mat->get_emission() * attenuation;
             current_ray = mat->scatter(current_ray, point, normal);
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        total_elapsed_time += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+        timer_count++;
         }
         return integrated;
     }
     
-    color per_pixel(int& i, int& j, Camera camera, vector3f upper_left, int& antialiasing_samples, std::vector<shape3d *> objects, std::vector<light *> lights, int& recursions) {
+    color per_pixel(int& i, int& j, Camera camera, vector3f upper_left, int& antialiasing_samples, double& pixels_sample_scale, std::vector<shape3d *> objects, int& recursions) {
         double red = 0, green = 0, blue = 0;
-        double pixels_sample_scale = 1.0 / antialiasing_samples;
-
         for (int sample = 0; sample < antialiasing_samples; sample++)
         {
-            ray r = shoot_ray_at(i, j, camera, upper_left);
-            color c = trace_ray(r, objects, lights, recursions);
+            // ray r = shoot_ray_at(i, j, camera, upper_left);
+            // color c = trace_ray(r, objects, recursions);
+            vector3f pixel_position = upper_left + camera.get_right() * dw * (j + random_double()) - camera.get_up() * dh * (i + random_double());
+            vector3f ray_direction = pixel_position - camera.get_position();
+            ray current_ray(pixel_position, ray_direction);
+            
+            color integrated = {0, 0, 0};
+            color attenuation = {1, 1, 1};
+                std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+            while (recursions--)
+            {
+                current_ray.reset_hit();
+
+                for (auto object : objects)
+                    object->calculate_hit_distance(current_ray);
+
+                if (!current_ray.hit_info.hit)
+                {
+                    integrated += sky_color * attenuation;
+                    break;
+                }
+
+                vector3f point = current_ray.hit_info.point;
+                vector3f normal = current_ray.hit_info.normal;
+                std::shared_ptr<material> mat = current_ray.hit_info.mat;
+
+                attenuation *= mat->get_color();
+                integrated += mat->get_emission() * attenuation;
+                current_ray = mat->scatter(current_ray, point, normal);
+            }
+                std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+                total_elapsed_time += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+                timer_count++;
+            color c = integrated;
             red += c.r;
             green += c.g;
             blue += c.b;
@@ -122,37 +178,43 @@ namespace utils
     }
 
     void capture() {
+        total_elapsed_time = 0;
+        timer_count = 0;
         int red = 0, green = 0, blue = 0;
 
         image.clear();
         printed = std::vector<bool>(11, false);
         std::cout << "Rendering started" << std::endl;
-        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
         vector3f upper_left = camera.get_position() + camera.get_direction() * near_ + camera.get_up() * viewport_height / 2 - camera.get_right() * viewport_width / 2;
+        std::chrono::steady_clock::time_point full_begin = std::chrono::steady_clock::now();
         for (int i = 0; i < image_height; i++)
         {
             for (int j = 0; j < image_width; j++)
             {
-                color c = per_pixel(i, j, camera, upper_left, antialiasing_samples, objects, lights, recursions);
+                color c = per_pixel(i, j, camera, upper_left, antialiasing_samples, pixels_sample_scale, objects, recursions);
                 double red = c.r * 255;
                 double green = c.g * 255;
                 double blue = c.b * 255;
 
                 image.set_pixel(j, i, red, green, blue);
                 progress_report(i, j, image_width, image_height);
+                // set_pixel_to_buffer(color_buffer, image_width, image_height, j, i, red, green, blue);
             }
         }
-        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-        auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+        std::chrono::steady_clock::time_point full_end = std::chrono::steady_clock::now();
+        auto full_time = std::chrono::duration_cast<std::chrono::microseconds>(full_end - full_begin).count();
         std::cout << "Rendering 100% completed" << std::endl;
-        std::cout << "Time taken = " << elapsed_time << "[ms]" << std::endl;
+        std::cout << "Time taken for total rendering = " << (full_time * 1.0)/1000000 << "[sec]" << std::endl;
+
+        // print_color_buffer_to_image(image, color_buffer, image_width, image_height);
+
+        std::cout << "Total time taken for selected code = " << (total_elapsed_time * 1.0)/1000000 << "[sec]" << std::endl;
+        // std::cout << "Average time taken for selected code = " << total_elapsed_time / timer_count << "[micro sec]" << std::endl;
+        std::cout << "percentage of time spent in selected code = " << (total_elapsed_time * 100.0) / full_time << "%" << std::endl;
         std::string image_name = "out-" + std::to_string(count++) + ".bmp";
         image.save_image("output-images/" + image_name);
         std::cout << "image saved: "+ image_name +"\n"<< std::endl;
     }
-
-    
 }
 
 void initGL()
@@ -190,10 +252,6 @@ void display()
     for (auto object : objects)
     {
         object->show();
-    }
-    for (auto light : lights)
-    {
-        light->show();
     }
 
     draw_axes();
@@ -304,7 +362,7 @@ void specialKeyListener(int key, int x, int y)
 
 int main(int argc, char **argv)
 {
-    std::string scene_file = "scenes/scene1.ini";
+    std::string scene_file = "scenes/scene2.ini";
     ini::IniFile ini(scene_file);
 
     vector3f camera_position, camera_target;
@@ -317,7 +375,7 @@ int main(int argc, char **argv)
     objects.push_back(board);
 
     int number_of_objects = ini["scene"]["number_of_objects"].as<int>();
-    int number_of_lights = ini["scene"]["number_of_lights"].as<int>();
+    sky_color = get_sky(ini);    
 
     for (int i = 0; i < number_of_objects; i++)
     {
@@ -326,25 +384,15 @@ int main(int argc, char **argv)
         if (object != nullptr)
             objects.push_back(object);
     }
-
-    for (int i = 0; i < number_of_lights; i++)
-    {
-        std::string light_name = "light" + std::to_string(i);
-        light *l = create_light(ini, light_name);
-        if (l != nullptr)
-            lights.push_back(l);
-    }
-
-    
     
     image.setwidth_height(image_width, image_height);
-
+    color_buffer.resize(image_width * image_height * 3);
     
 
 
     glutInit(&argc, argv);                                    // Initialize GLUT
     glutInitWindowSize(600, 600);             // Set the window's initial width & height
-    glutInitWindowPosition(750, 100);                           // Position the window's initial top-left corner
+    glutInitWindowPosition(100, 100);                           // Position the window's initial top-left corner
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB); // Depth, Double buffer, RGB color
     glutCreateWindow("Raytracing");                           // Create a window with the given title
     glutDisplayFunc(display);                                 // Register display callback handler for window re-paint

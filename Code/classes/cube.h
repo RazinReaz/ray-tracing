@@ -27,7 +27,7 @@ class cube : public shape3d {
         this->faces.push_back(new face_(vector3f(-1, 0, 0), position + vector3f(-size / 2, 0, 0), size));
     }
 
-    void calculate_hit_distance(ray &r) override {
+    void calculate_hit_distance(ray &r) const override {
         double distance;
         for (auto face : this->faces) {
             if (face->is_hit_by_ray(r, distance)) {
@@ -37,7 +37,8 @@ class cube : public shape3d {
         return;
     }
 
-    vector3f normal_at(vector3f &point) override {
+    vector3f normal_at(const vector3f &point) const override
+    {
         for (auto face : faces) {
             if (face->contains_point(point)) {
                 return face->normal;
@@ -46,7 +47,8 @@ class cube : public shape3d {
         assert (false);
     }
 
-    color get_color_at(vector3f &point) override {
+    color get_color_at(const vector3f &point) const override
+    {
         return this->clr;
     }
 

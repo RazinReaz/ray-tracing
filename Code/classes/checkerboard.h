@@ -18,18 +18,21 @@ public:
         this->size = size;
     }
 
-    void calculate_hit_distance(ray& r) override {
+    void calculate_hit_distance(ray &r) const override
+    {
         double hit_distance = -1.0 * r.origin.z / r.direction.z;
         if (hit_distance < 0)
             return;
         r.set_hit(hit_distance, vector3f(0, 0, 1), this->mat);
     }
 
-    vector3f normal_at(vector3f& point) override {
+    vector3f normal_at(const vector3f &point) const override
+    {
         return vector3f(0, 0, 1);
     }
 
-    color get_color_at(vector3f &point) override {
+    color get_color_at(const vector3f &point) const override
+    {
         int i = (int) (point.y + i_limit * this->size) / this->size; // don't optimize this
         int j = (int) (point.x + j_limit * this->size) / this->size; // don't optimize this
         if ((i + j) % 2 == 0)

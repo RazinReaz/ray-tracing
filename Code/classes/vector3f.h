@@ -30,20 +30,20 @@ public:
     double length() const;
     double length_squared() const;
     vector3f normalize() const;
-    vector3f cross(const vector3f& v);
-    double dot(const vector3f& v);
+    vector3f cross(const vector3f& v) const;
+    double dot(const vector3f& v) const;
     vector3f rotate(double angle, const vector3f& axis);
     vector3f scale(double sx, double sy, double sz);
     vector3f scale(double s);
     bool near_zero() const;
     // void something before scale()
-    vector3f operator+(vector3f v);
-    vector3f operator-(vector3f v);
-    vector3f operator*(double scalar);
-    vector3f operator/(double scalar);
+    vector3f operator+(const vector3f& v) const;
+    vector3f operator-(const vector3f& v) const;
+    vector3f operator*(double scalar) const;
+    vector3f operator/(double scalar) const;
     vector3f operator=(const vector3f &v);
-    vector3f operator+=(vector3f v);
-    vector3f operator-=(vector3f v);
+    vector3f operator+=(const vector3f& v);
+    vector3f operator-=(const vector3f& v);
 
     friend std::ostream& operator<<(std::ostream& os, vector3f v);
 };
@@ -76,11 +76,11 @@ vector3f vector3f::normalize() const{
     return vector3f(x * l, y * l, z * l);
 }
 
-vector3f vector3f::cross(const vector3f& v) {
+vector3f vector3f::cross(const vector3f& v) const {
     return vector3f(y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x);
 }
 
-double vector3f::dot(const vector3f& v) {
+double vector3f::dot(const vector3f& v) const {
     return x*v.x + y*v.y + z*v.z;
 }
 
@@ -99,19 +99,19 @@ bool vector3f::near_zero() const {
     return (fabs(x) < s) && (fabs(y) < s) && (fabs(z) < s);
 }
 
-vector3f vector3f::operator+(vector3f v) {
+vector3f vector3f::operator+(const vector3f& v) const {
     return vector3f(x + v.x, y + v.y, z + v.z);
 }
 
-vector3f vector3f::operator-(vector3f v) {
+vector3f vector3f::operator-(const vector3f &v) const {
     return vector3f(x - v.x, y - v.y, z - v.z);
 }
 
-vector3f vector3f::operator*(double scalar) {
+vector3f vector3f::operator*(double scalar) const {
     return vector3f(x*scalar, y*scalar, z*scalar);
 }
 
-vector3f vector3f::operator/(double scalar) {
+vector3f vector3f::operator/(double scalar) const {
     return vector3f(x / scalar, y / scalar, z / scalar);
 }
 
@@ -122,14 +122,15 @@ vector3f vector3f::operator=(const vector3f &v) {
     return *this;
 }
 
-vector3f vector3f::operator+=(vector3f v) {
+vector3f vector3f::operator+=(const vector3f &v)
+{
     x += v.x;
     y += v.y;
     z += v.z;
     return *this;
 }
 
-vector3f vector3f::operator-=(vector3f v) {
+vector3f vector3f::operator-=(const vector3f& v) {
     x -= v.x;
     y -= v.y;
     z -= v.z;

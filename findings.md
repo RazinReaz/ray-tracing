@@ -43,12 +43,12 @@ I ran the capturing code 4 times and took the average time.
 - [ ] using const
 - [x] ray inside sphere
 - [ ] finish refactoring
-    - testing needed
-    - `include`/`headers` folder
-    - fix the `metal` and `lambertian` classes staying in `interfaces.h`
+    - [x] testing needed
+    - [ ] `include`/`headers` folder
+    - [x] fix the `metal` and `lambertian` classes staying in `interfaces.h`
 - [x] anti aliasing
 - [ ] optimize sqrt
-- [ ] shared pointer for objects array
+- [ ] shared pointer
 - [x] lambertian bounce implementation
     - recursion value needed
     - I don't know how to handle light source
@@ -59,8 +59,9 @@ I ran the capturing code 4 times and took the average time.
     - [x] attenuation
     - [x] material index in the object
 - [x] gamma correction
-- [ ] emmisive material
-- [ ] bidirectional path tracing
+- [ ] specular component
+- [x] emmisive material
+- [ ] skybox
 - [ ] real time
     - will not go inside the ray
-    - 
+    - probably not a good idea on opengl
