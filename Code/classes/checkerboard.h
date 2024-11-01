@@ -8,6 +8,46 @@
 #include "shape3d.h"
 
 
+class plane : public shape3d
+{
+public:
+    plane(std::shared_ptr<material> mat) : shape3d(mat) {}
+
+    void calculate_hit_distance(ray &r) const override
+    {
+        double hit_distance = -1.0 * r.origin.z / r.direction.z;
+        if (hit_distance < 0)
+            return;
+        r.set_hit(hit_distance, vector3f(0, 0, 1), this->mat);
+    }
+
+    vector3f normal_at(const vector3f &point) const override
+    {
+        return vector3f(0, 0, 1);
+    }
+
+    color get_color_at(const vector3f &point) const override
+    {
+        return this->mat->get_color();
+    }
+
+    void show() override {
+        glBegin(GL_QUADS);
+        glColor3f(this->mat->get_color().r, this->mat->get_color().g, this->mat->get_color().b);
+        glVertex3f(-1000, -1000, 0);
+        glVertex3f(1000, -1000, 0);
+        glVertex3f(1000, 1000, 0);
+        glVertex3f(-1000, 1000, 0);
+        glEnd();
+    }
+
+    void print() override {
+        std::cout << "Plane: " << std::endl;
+        std::cout << "Material: " << this->mat->type() << std::endl;
+    }
+};
+
+
 
 class checkerboard : public shape3d
 {

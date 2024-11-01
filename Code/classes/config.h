@@ -94,12 +94,13 @@ shape3d *create_plane(ini::IniFile& ini)
         int checkerboard_size = ini["plane"]["size"].as<int>();
         std::shared_ptr<material> mat = create_material(ini, ini["plane"]["material"].as<std::string>());
         return new checkerboard(checkerboard_size, mat);
-
     } else if (type == "sphere") {
         double radius = ini["plane"]["radius"].as<double>();
         std::shared_ptr<material> mat = create_material(ini, ini["plane"]["material"].as<std::string>());
         return new sphere({0, 0, -radius}, radius, mat);
-
+    } else if (type == "plane"){
+        std::shared_ptr<material> mat = create_material(ini, ini["plane"]["material"].as<std::string>());
+        return new plane(mat);
     } else {
         std::cout << "Invalid plane type" << std::endl;
         return nullptr;
@@ -119,7 +120,7 @@ shape3d *create_object(ini::IniFile& ini, const std::string& object_name)
     }
     else
     {
-        std::cout << "Invalid object type" << std::endl;
+        std::cout << "Invalid object type:" << object_type << std::endl;
         return nullptr;
     }
 }

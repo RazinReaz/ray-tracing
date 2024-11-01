@@ -7,7 +7,6 @@
 #include "shape3d.h"
 #include "ray.h"
 
-bool fast_disregard = false;
 
 class sphere : public shape3d
 {
@@ -58,7 +57,7 @@ public:
 
     vector3f normal_at(const vector3f &point) const override
     {
-        return (point - this->center)/this->radius; //! RAZIN: changed
+        return (point - this->center)/this->radius;
     }
 
     color get_color_at(const vector3f &point) const override

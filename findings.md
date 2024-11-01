@@ -23,32 +23,27 @@ otherwise, we can calculate the two solutions and return the one with the smalle
 The discriminant (b**2 - c (I know, but the math works if you do it manually)) will be positive and one of the two
 solutions will be positive. We set t equal to the positive one (for now)
 
-<!-- ## results
-I ran the capturing code 4 times and took the average time.
-### a lot of spheres in front of the viewport
-| without fast disregard | with fast disregard |
-|------------------------|---------------------|
-| 4937.75 ms (avg)       | 5119.25 ms (avg)    |
-### a lot of spheres behind the viewport
-| without fast disregard | with fast disregard |
-|------------------------|---------------------|
-| 4069.25 ms (avg)       | 8893.75 ms (avg)    | -->
 
 
 # TODO
+- [ ] ReSTir
+- [ ] back face culling 
+- [ ] specular component (BRDF?)
+- [ ] skybox
+- [ ] real time
+    - will not go inside the ray
+    - probably not a good idea on opengl
 - [x] config file
 - [x] refactor with config
 - [x] fix `fast disregard` in ray sphere intersection.
-- [ ] back face culling 
-- [ ] using const
+- [x] using const
 - [x] ray inside sphere
-- [ ] finish refactoring
+- [x] finish refactoring
     - [x] testing needed
-    - [ ] `include`/`headers` folder
     - [x] fix the `metal` and `lambertian` classes staying in `interfaces.h`
 - [x] anti aliasing
-- [ ] optimize sqrt
-- [ ] shared pointer
+- [x] optimize sqrt
+- [x] shared pointer
 - [x] lambertian bounce implementation
     - recursion value needed
     - I don't know how to handle light source
@@ -59,9 +54,4 @@ I ran the capturing code 4 times and took the average time.
     - [x] attenuation
     - [x] material index in the object
 - [x] gamma correction
-- [ ] specular component
 - [x] emmisive material
-- [ ] skybox
-- [ ] real time
-    - will not go inside the ray
-    - probably not a good idea on opengl

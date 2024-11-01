@@ -56,7 +56,7 @@ namespace utils
         if ((int)completed % 10 == 0 && !printed[(int)std::round(completed / 10)])
         {
             printed[(int)std::round(completed / 10)] = true;
-            std::cout << "Rendering " << (int)completed << "% completed" << std::endl;
+            std::cout << "\rRendering " << (int)completed << "% completed" << std::flush;
         }
         return;
     }
@@ -203,7 +203,7 @@ namespace utils
         }
         std::chrono::steady_clock::time_point full_end = std::chrono::steady_clock::now();
         auto full_time = std::chrono::duration_cast<std::chrono::microseconds>(full_end - full_begin).count();
-        std::cout << "Rendering 100% completed" << std::endl;
+        std::cout << "\rRendering 100% completed" << std::endl;
         std::cout << "Time taken for total rendering = " << (full_time * 1.0)/1000000 << "[sec]" << std::endl;
 
         // print_color_buffer_to_image(image, color_buffer, image_width, image_height);
@@ -311,10 +311,6 @@ void keyboardListener(unsigned char key, int xx, int yy)
     case 's':
         camera.move_with_same_target({0, 1, 0}, -bonus_mark_rotation_rate);
         break;
-    case 'f':
-        fast_disregard = !fast_disregard;
-        std::cout << "Fast disregard is " << (fast_disregard ? "on" : "off") << std::endl;
-        break;
     case 'g':
         gamma_correction_enabled = !gamma_correction_enabled;
         std::cout << "Gamma correction is " << (gamma_correction_enabled ? "on" : "off") << std::endl;
@@ -362,7 +358,7 @@ void specialKeyListener(int key, int x, int y)
 
 int main(int argc, char **argv)
 {
-    std::string scene_file = "scenes/scene2.ini";
+    std::string scene_file = "scenes/scene3.ini";
     ini::IniFile ini(scene_file);
 
     vector3f camera_position, camera_target;
@@ -386,7 +382,7 @@ int main(int argc, char **argv)
     }
     
     image.setwidth_height(image_width, image_height);
-    color_buffer.resize(image_width * image_height * 3);
+    color_buffer.reserve(image_width * image_height * 3);
     
 
 
