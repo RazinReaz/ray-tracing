@@ -2,9 +2,9 @@
 ![Day scene](./code/assets/misc/shei.bmp)
 ![5 spheres](./code/assets/5%20spheres/scene%203%201000.bmp)
 ![reflection on sphere](./code/assets/misc/M=100.bmp)
+![materials](./code/assets/video/one%20sphere.gif)
 ![Night scene 1](./code/assets/night/500%20samples.bmp)
-![Night Scene 2](./code/assets/night/1000%20samples%20emission%20.bmp)
-![Night Scene 3](./code/assets/night/emit%20without%20atten.bmp
+![Night Scene 3](./code/assets/night/emit%20without%20atten.bmp)
 
 
 An offline ray tracer in OpenGL which supports
@@ -16,10 +16,9 @@ An offline ray tracer in OpenGL which supports
 
 This will be a project where I keep adding features until ReSTIR (or more) is implemented.
 
-
 ## Video demo
-Samples per pixel (SPP) has been set as 10, 100, and 1000 for this video
-<video src="./code/assets/video/5 spheres transition.mp4" width="600" height="600" controls></video>
+[![5 spheres](https://img.youtube.com/vi/ligIcI4hCak/0.jpg)](https://youtube.com/shorts/ligIcI4hCak)\\
 
-For this video, spp has been set to 100, different materials were used for the spheres (lambertian, rough metal and smooth metal respectively)
-<video src="./code/assets/video/one sphere.mp4" width="600" height="600" controls></video>
+
+The youtube version is heavily downgraded in terms of quality.
+Please click [here](https://github.com/RazinReaz/ray-tracing/blob/main/code/assets/video/5%20spheres%20transition.mp4) for the full resolution video.
