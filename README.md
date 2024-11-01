@@ -14,6 +14,8 @@ An offline ray tracer in OpenGL which supports
 - Anti-aliasing
 - Ambient occlusion
 
+This will be a project where I keep adding features until ReSTIR (or more) is implemented.
+
 
 ## Video demo
 Samples per pixel (SPP) has been set as 10, 100, and 1000 for this video
